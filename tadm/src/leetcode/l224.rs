@@ -1,7 +1,7 @@
 use core::panic;
 
 #[derive(Debug)]
-struct Op {
+struct Operator {
     in_priority: u8,
     out_priority: u8,
     calc: Calc,
@@ -33,44 +33,44 @@ fn pow(a: i32, b: i32) -> i32 {
     a.pow(b as u32)
 }
 
-fn parse_op(c: &char, is_sub: bool) -> Op {
+fn parse_op(c: &char, is_sub: bool) -> Operator {
     match c {
-        '+' => Op {
+        '+' => Operator {
             in_priority: 1,
             out_priority: 1,
             calc: Calc::Binary(add),
         },
         '-' => {
             if is_sub {
-                Op {
+                Operator {
                     in_priority: 1,
                     out_priority: 1,
                     calc: Calc::Binary(sub),
                 }
             } else {
-                Op {
+                Operator {
                     in_priority: 5,
                     out_priority: 5,
                     calc: Calc::Unary(neg),
                 }
             }
         }
-        '*' => Op {
+        '*' => Operator {
             in_priority: 2,
             out_priority: 2,
             calc: Calc::Binary(mul),
         },
-        '/' => Op {
+        '/' => Operator {
             in_priority: 2,
             out_priority: 2,
             calc: Calc::Binary(div),
         },
-        '^' => Op {
+        '^' => Operator {
             in_priority: 3,
             out_priority: 4,
             calc: Calc::Binary(pow),
         },
-        '(' => Op {
+        '(' => Operator {
             in_priority: 0,
             out_priority: 6,
             calc: Calc::LeftParen,
@@ -79,8 +79,23 @@ fn parse_op(c: &char, is_sub: bool) -> Op {
     }
 }
 
+fn do_calc(calc: Calc, operands: &mut Vec<i32>) {
+    match calc {
+        Calc::LeftParen => {}
+        Calc::Binary(calc) => {
+            let b = operands.pop().unwrap();
+            let a = operands.pop().unwrap();
+            operands.push(calc(a, b));
+        }
+        Calc::Unary(calc) => {
+            let a = operands.pop().unwrap();
+            operands.push(calc(a));
+        }
+    }
+}
+
 pub fn calculate(s: String) -> i32 {
-    let mut operators = vec![Op {
+    let mut operators = vec![Operator {
         in_priority: 0,
         out_priority: 6,
         calc: Calc::LeftParen,
@@ -117,48 +132,32 @@ pub fn calculate(s: String) -> i32 {
                                 Calc::LeftParen => {
                                     break;
                                 }
-                                Calc::Binary(calc) => {
-                                    let b = operands.pop().unwrap();
-                                    let a = operands.pop().unwrap();
-                                    operands.push(calc(a, b));
-                                }
-                                Calc::Unary(calc) => {
-                                    let a = operands.pop().unwrap();
-                                    operands.push(calc(a));
+                                _ => {
+                                    do_calc(operator.calc, &mut operands);
                                 }
                             }
                         }
                     } else {
                         let operator = parse_op(&c, next_is_sub);
+                        next_is_sub = false;
 
-                        loop {
-                            if let Some(last_operator) = operators.last() {
-                                if (last_operator.in_priority < operator.out_priority) {
-                                    break;
-                                }
+                        while let Some(last_operator) = operators.last() {
+                            if (last_operator.in_priority < operator.out_priority) {
+                                break;
+                            }
 
-                                if let Some(operator) = operators.pop() {
-                                    match operator.calc {
-                                        Calc::LeftParen => {
-                                            break;
-                                        }
-                                        Calc::Binary(calc) => {
-                                            let b = operands.pop().unwrap();
-                                            let a = operands.pop().unwrap();
-                                            operands.push(calc(a, b));
-                                        }
-                                        Calc::Unary(calc) => {
-                                            let a = operands.pop().unwrap();
-                                            operands.push(calc(a));
-                                        }
+                            if let Some(operator) = operators.pop() {
+                                match operator.calc {
+                                    Calc::LeftParen => {
+                                        break;
+                                    }
+                                    _ => {
+                                        do_calc(operator.calc, &mut operands);
                                     }
                                 }
-                            } else {
-                                break;
                             }
                         }
 
-                        next_is_sub = false;
                         operators.push(operator);
                     }
                 }
