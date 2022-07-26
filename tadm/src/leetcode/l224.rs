@@ -1,5 +1,3 @@
-use core::panic;
-
 #[derive(Debug)]
 struct Operator {
     in_priority: u8,
