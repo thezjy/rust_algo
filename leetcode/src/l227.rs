@@ -96,8 +96,8 @@ pub fn calculate(s: String) -> i32 {
 
                         loop {
                             if let Some(last_operator) = operators.last() {
-                                if (last_operator.inside_stack_priority()
-                                    < operator.outside_stack_priority())
+                                if last_operator.inside_stack_priority()
+                                    < operator.outside_stack_priority()
                                 {
                                     break;
                                 }

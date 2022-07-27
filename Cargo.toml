@@ -2,5 +2,6 @@
 
 members = [
     "sedgewick",
-    "tadm"
+    "tadm",
+    "leetcode",
 ]

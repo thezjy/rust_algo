@@ -21,7 +21,7 @@ pub fn find_judge(n: i32, trust: Vec<Vec<i32>>) -> i32 {
         if in_degree[i as usize] == judge_in_degree && out_degree[i as usize] == judge_out_degree {
             judge = i;
             judge_count += 1;
-            if (judge_count > 1) {
+            if judge_count > 1 {
                 break;
             }
         }

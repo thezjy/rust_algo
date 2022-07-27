@@ -140,7 +140,7 @@ pub fn calculate(s: String) -> i32 {
                         next_is_sub = false;
 
                         while let Some(last_operator) = operators.last() {
-                            if (last_operator.in_priority < operator.out_priority) {
+                            if last_operator.in_priority < operator.out_priority {
                                 break;
                             }
 

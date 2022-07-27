@@ -1,11 +1,6 @@
-use std::{
-    collections::HashMap,
-    fmt,
-    mem::MaybeUninit,
-    ptr::{self, NonNull},
-};
+use std::{collections::HashMap, ptr::NonNull};
 
-use crate::dlist::{DList, Link, Node};
+use tadm::dlist::{DList, Link, Node};
 
 #[derive(Copy, Clone)]
 pub struct Element {
@@ -13,14 +8,14 @@ pub struct Element {
     val: i32,
 }
 
-struct LRUCache {
+pub struct LRUCache {
     cap: usize,
     store: HashMap<i32, Link<Element>>,
     list: DList<Element>,
 }
 
 impl LRUCache {
-    fn new(capacity: i32) -> Self {
+    pub fn new(capacity: i32) -> Self {
         let cap = capacity as usize;
         LRUCache {
             cap,
@@ -29,7 +24,7 @@ impl LRUCache {
         }
     }
 
-    fn put(&mut self, key: i32, val: i32) {
+    pub fn put(&mut self, key: i32, val: i32) {
         unsafe {
             let is_full = self.is_full();
 
@@ -55,7 +50,7 @@ impl LRUCache {
         }
     }
 
-    fn get(&mut self, key: i32) -> i32 {
+    pub fn get(&mut self, key: i32) -> i32 {
         unsafe {
             if let Some(&link) = self.store.get(&key) {
                 self.list.move_back_link(link);
@@ -67,11 +62,11 @@ impl LRUCache {
         }
     }
 
-    fn len(&self) -> usize {
+    pub fn len(&self) -> usize {
         self.store.len()
     }
 
-    fn is_full(&self) -> bool {
+    pub fn is_full(&self) -> bool {
         self.store.len() == self.cap
     }
 }
